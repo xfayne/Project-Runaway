@@ -13,7 +13,6 @@ function [ level ] = level(nLevel, ringSize)
 % 0-back (no rings)
 % if no nback : nLevel == -1
 % if no rings : ringSize == 'no'
-*****edit****
 level = 0;
 
 if (strcmp(ringSize, 'big') && strcmp(nLevel, '1'))
