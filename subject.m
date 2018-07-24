@@ -1,6 +1,6 @@
 classdef subject
         
-    %  class of Subject. Subject contains a blocks: array of block objects (with all the fields that
+    %  class of Subject. Subject contains blocks: array of block objects (with all the fields that
     %  can be used to labels.) and channels (ecg, gsr)
     
     properties
@@ -14,11 +14,11 @@ classdef subject
        %Constructor: gets blocks and ecg, gsr data
    methods
    function sub = subject(blocks, ecg_data, gsr_data)
-       if  nargin == 3 %If there are 3 arguments
+       %if  nargin == 3 %If there are 3 arguments
        sub.blocks = blocks;
-       sub.channels(1) = ecg_data;
-       sub.channels(2) = gsr_data;
-       end
+       sub.channels{1,1} = ecg_data;
+       sub.channels{2,1} = gsr_data;
+       %end
 %        sub.channels(1).signals(), sub.channels(1).labels()  = {seg(ecg, block)};
 %        sub.channels(2).signals() , sub.channels(2).labels() = {seg(ecg, block)};
               
