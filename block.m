@@ -1,6 +1,6 @@
 %%Class of block with all the fields: 
 
-classdef block < subject %subclass of subject
+classdef block
    properties
     condition; %stress/ noStress
     nLevel; %0,...7
