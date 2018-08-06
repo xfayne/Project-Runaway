@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Data's parameters:   
     %# of subjects:
-    SUBJECTS = 2; 
+    SUBJECTS = 1; 
     %Number of channels (signals): ECG + GSR:    
     CHANNELS = 2; 
     
@@ -38,7 +38,7 @@
     RANDOM_ALL = false;
     
     %The number of subjects will use for train data if RANDOM_ALL == false
-    %(train_per of the subjects number rounded)
+    %(train_per of the subjects number which round up)
     bound = -1;
     if RANDOM_ALL == false
         bound = round(SUBJECTS*train_per);
@@ -46,7 +46,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Files' parameters
-    PATH = 'C:\Users\User\Documents\2017-2018\Project\MatlabScripts\load_data\'; 
+    PATH = 'C:\Users\User\Documents\2017-2018\Project\data\007\'; 
     %Files' names:
     GSR_FILENAME_ST = '_BAT_ST_GSR'; 
     GSR_FILENAME_NS = '_BAT_NS_GSR';
@@ -75,7 +75,7 @@ for i = 1:SUBJECTS
 
     %Subject's number:
     sub_num = '00%d';
-    sub_num = sprintf(sub_num,i+6);
+    sub_num = sprintf(sub_num,i+7); 
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%Load ECG files: stress + noStress:
@@ -219,7 +219,7 @@ end
         %Means RANDOM_ALL == false
         %Train data and labels:
         if i == bound && RANDOM_ALL == false
-            [train_input, train_labels] = make_inputs_labels(data, labels, counter); 
+            [train_input, train_labels] = make_input_labels(data, labels, counter); 
             counter = zeros(1,num_levels); %Reset the counter
             %**Need to reset data and labels also
         %Test data and labels:
@@ -239,5 +239,5 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Save .mat file includes the test and train arrays:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- save('mat_to_python.mat','train_input','train_labels','test_input','test_labels');
+save('mat_to_python.mat','train_input','train_labels','test_input','test_labels');
     

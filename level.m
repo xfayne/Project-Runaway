@@ -34,6 +34,8 @@ elseif (strcmp(ringSize, 'small') && strcmp(nLevel, '-1'))
     level = 0; %Baseline
 elseif (strcmp(ringSize, 'no') && strcmp(nLevel, '0'))
     level = 0; %Baseline
+else
+    error('Problem with Level');
 end
 
 

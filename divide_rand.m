@@ -12,7 +12,7 @@ function [train_input , train_labels, test_input , test_labels] = divide_rand( d
 %is a cell array of size 1 X number of inputs (size(train_input) = size
 %(train_labels), size(test_input) = size(test_labels)
 
-[m,num_of_labels] = size(count);
+[m,num_of_labels] = size(count); %***TO- YONIT: need to delete m? ***
 counter_train_start = 0; % in order to concatinate data from all levels
 counter_test_start = 0;% in order to concatinate data from all levels
 
