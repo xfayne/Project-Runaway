@@ -8,9 +8,9 @@ These arrays are:
 	test_input	
 	test_label
 
-***Danielle needs to add details about the functions***
+**needs to add details about the functions***
 
-
+-ECG_save_to_mat: takes ecg files and save into mat files
 
 Instructions:
 
