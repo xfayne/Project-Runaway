@@ -1,4 +1,6 @@
 function [ Blocks ] = make_blocks( EEG_NS, EEG_ST )
+%EEG_NS : if file is loaded otherwise: EEG_NS == 0
+%EEG_ST : if file is loaded otherwise: EEG_ST == 0
 %Returns: 2x2 cell array: Blocks{1:2,1} = 2 matrix with size 26x3  which contains :
 %all bat blocks:
 %column 1: start time; 
@@ -21,10 +23,14 @@ for j = 1:2 %Extruct from stress and no stress conditions
     index = 1; 
     foundStart = false; %Flag: if we found runStart we need to find the next runEnd 
 
-    if j == 1 %NoStress
+    if (j == 1) && (isequaln(EEG_NS,'0')==0) %NoStress and file is valid
         EEG = EEG_NS;
-    else %Stress
+    elseif (j == 1) && (isequaln(EEG_NS,'0')==1) %NoStress and file isn't valid so break
+        continue;
+    elseif (j == 2) && (isequaln(EEG_ST,'0')==0) %Stress and file is valid
         EEG = EEG_ST;
+    elseif (j == 2) && (isequaln(EEG_ST,'0')==1)  %Stress and file isn't valid so break
+        continue;
     end
     
     %Loop for making a matrix of the blocks and parse all block's info (nLevel, ringSize etc.)

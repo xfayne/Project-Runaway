@@ -329,7 +329,7 @@ end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %Split the data and labels into test and train: 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %***NEED TO UPDATE: NO WORKING FOR NOW
+        %***NEED TO UPDATE: NO WORKING N
             %If we split the data in to test and train by subjects:
             %Means RANDOM_ALL == false
             %Train data and labels:

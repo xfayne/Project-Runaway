@@ -1,12 +1,11 @@
 
-SUBJECTS = 5;
+SUBJECTS = 25;
 
 %Array of subjects' numbers that we won't load their files
-    notInclude = [2,3,4];
-    %Number of valid subjects:
+    notInclude = [1,2,3,4,6,14,15,18,20,21,23,25];    %Number of valid subjects:
     valSUBJECTS = length(notInclude);
 
-PATH = 'C:/Users/User/Documents/2017-2018/Project/data/007/';
+PATH = 'C:\Users\User\Documents\limudim\project\load_data';
 
 ECG_FILENAME_ST = '_BAT_ST_ECG';
 ECG_FILENAME_NS = '_BAT_NS_ECG';
@@ -14,7 +13,11 @@ ECG_FILENAME_NS = '_BAT_NS_ECG';
  for i = 1:SUBJECTS
     if ismember(i,notInclude) == 0
         %Subject's number
-        sub_num = '00%d';
+        if i < 10
+            sub_num = '00%d';
+        elseif i >= 10
+            sub_num = '0%d';
+        end
         sub_num = sprintf(sub_num,i);
 
         %%Load ECG .set files and save to .mat files: stress + noStress 
