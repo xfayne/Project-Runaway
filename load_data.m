@@ -13,7 +13,8 @@
     global BLOCKS; 
     BLOCKS = 26;
     %# of difficulty levels: (include base level)
-    global num_levels; 
+    % Change to 4 if want less labels
+    global num_levels; %Including baseline
     num_levels = 6;
 %%  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,7 +24,7 @@
     
     %Matrix of subjects' numbers that we won't load their files: 
     % Stress/ NoStress (ECG + GSR)
-    filesNotes = 'C:\Users\User\Documents\2017-2018\Project\MatlabScripts\load_data\fromYonit\load_data\notesBatData.xlsx';
+    filesNotes = 'C:\Users\User\Documents\2017-2018\Project\MatlabScripts\load_data\fromYonit\data\notesBatData.xlsx';
     all_files = xlsread(filesNotes); %Read excel file with table which includes: 
     %index 1 to valid file and 0 to invalid.
     noStress_f = all_files(:,2)';
@@ -50,11 +51,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %For the network: inputes' parameters:
     %Train percentage:
-    train_per = 0.8; 
+    train_per = 0.7; 
     %window size: the input for network:
     seg_len = 2200; 
     %Over lap for the windows:
-    over_lap = 0.3; 
+    over_lap = 0.2; 
     
     %RANDOM_ALL = true: if we want to split the data into train and test in random order
     %Which means we mix all the subjects'es data 
@@ -71,12 +72,14 @@
     %Make Stress/ No Stress labels
     make_StNoSt = 1; 
     
+    %Random eack row in data also before calling divide_rand func
+    rand_flag = 1;
     
     
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Files' parameters
-    PATH = 'C:\Users\User\Documents\2017-2018\Project\MatlabScripts\load_data\fromYonit\load_data\'; 
+    PATH = 'C:\Users\User\Documents\2017-2018\Project\MatlabScripts\load_data\fromYonit\data\'; 
     %Files' names:
     GSR_FILENAME_ST = '_BAT_ST_GSR'; 
     GSR_FILENAME_NS = '_BAT_NS_GSR';
@@ -184,7 +187,7 @@ for i = 1:SUBJECTS
     %%Parse all the blocks' times and parameters:
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %(More details explained in make_blocks() function)
-    blocks = make_blocks(ecg_ns, ecg_st); 
+    blocks = make_blocks(ecg_ns, ecg_st, num_levels); 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%Load GSR files: stress + noStress:
@@ -290,15 +293,19 @@ end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %Counting how many segments we have per level:
         counter = zeros(1,num_levels); 
-
-        %Matrix of the data's segments: (inputs). Row i = Level i-1 ;1<=i<=6
+        counter_st = zeros(1,2);
+        
+        %Matrix of the data's segments: (inputs). Row i = Level i-1 ;1<=i<=num_levels
         data = cell(num_levels,1); 
+        
+        %Matrix of the data's segments: (inputs). Row 1 = NoStress; row 2 = Stress
+        StNoSt_data = cell(2,1); 
 
         %Matrix of the segments' labels. Row i = Level i-1 ;1<=i<=6
         labels = cell(num_levels,1); 
         
         %Matrix of the segments' labels: Stress/NoStress conditions
-        StNoSt_labels = cell(num_levels,1); 
+        StNoSt_labels = cell(2,1); 
         
     %Loop for all subjects in : subjects: 
     %Per each subject:
@@ -309,7 +316,7 @@ end
     valSUBJECTS = (j-1); %Update number of valid subjects
     for i = 1:valSUBJECTS
         sub_num = sub_ind(i);
-        [tmp_data, tmp_labels, tmp_counter, tmp_st_labels] = parser_levels(subjects(i), seg_len, over_lap, filesLoaded, sub_num,make_StNoSt );
+        [tmp_data, tmp_labels, tmp_counter, tmp_st_data, tmp_st_labels, tmp_counter_st ] = parser_levels(subjects(i), seg_len, over_lap, filesLoaded, sub_num,make_StNoSt, num_levels );
         
         
         %Update data and labels
@@ -318,11 +325,20 @@ end
             to_add = tmp_counter(1,row); %Number of segments we want to add 
             data(row, last+1: last + to_add) = tmp_data(row,1:to_add); %Add new segments in the row
             labels(row, last+1: last + to_add) = tmp_labels(row,1:to_add); %Add new segments in the row
-            if make_StNoSt == 1
+
+        end
+        
+        if make_StNoSt == 1
+            for row = 1:2
+                last = counter_st(1,row);  %Number of segments we have so far 
+                to_add = tmp_counter_st(1,row); %Number of segments we want to add 
+                StNoSt_data(row, last+1: last + to_add) = tmp_st_data(row,1:to_add); %Add new segments in the row
                 StNoSt_labels(row, last+1: last + to_add) = tmp_st_labels(row,1:to_add); %Add new segments in the row
             end
+            %Update the global counter
+            counter_st = counter_st + tmp_counter_st; 
         end
-
+        
         %Update the global counter
         counter = counter + tmp_counter; 
 
@@ -343,15 +359,37 @@ end
             end
     end
     
+%Set the data that each level will have equal size of data: Random before between subjects if rand_flag == 1.     
+[new_data, new_labels, new_counter ] = equal_size( data, labels, counter, rand_flag );   
+ 
+data = new_data ;
+labels = new_labels ;
+counter = new_counter;
+
+
 %If we split the data in to test and train not by subjects:
 %Means RANDOM_ALL == true
 if RANDOM_ALL == true
     %Split data and labels into train and test
     [train_input, train_labels, test_input, test_labels] = divide_rand(data, labels, counter, train_per); 
     if make_StNoSt == 1
-        [train_input_st, train_labels_st, test_input_st, test_labels_st] = divide_rand(data, StNoSt_labels, counter, train_per); 
+        [train_input_st, train_labels_st, test_input_st, test_labels_st] = divide_rand(StNoSt_data, StNoSt_labels, counter_st, train_per); 
     end
 end
+
+%Added need to change
+%[train_input_st, train_labels_st, test_input_st, test_labels_st] = classify(train_input_st, train_labels_st, test_input_st, test_labels_st, 1);
+
+%%Make dataset with features
+[dataset] = make_dataset(subjects);
+%Encode Stress/NoStress 
+T = strcmp(dataset.conditions, 'stress');
+dataset.conditions = T;
+dataset_n = dataset;
+%Change the order of dataset
+%dataset_n = [dataset(:,1:2),dataset(:,5:14),dataset(:,17:18),dataset(:,3)];
+%Save to .csv file for learning
+writetable(dataset_n,'data.csv') ;
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

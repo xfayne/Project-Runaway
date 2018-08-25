@@ -1,4 +1,4 @@
-function [train_input , train_labels, test_input , test_labels] = divide_rand( data, labels, count, train_per)
+function [train_input , train_labels, test_input , test_labels] = divide_rand(data, labels, count, train_per)
 %inputs: 
     %data: subject/subjects  cell arrays, each cell contains time-windowed
     %data matrixes of GSR and ECG according to level (0-5) 
@@ -12,11 +12,16 @@ function [train_input , train_labels, test_input , test_labels] = divide_rand( d
 %is a cell array of size 1 X number of inputs (size(train_input) = size
 %(train_labels), size(test_input) = size(test_labels)
 
-[m,num_of_labels] = size(count); %***TO- YONIT: need to delete m? ***
+[m,num_of_labels] = size(count); 
+
 counter_train_start = 0; % in order to concatinate data from all levels
 counter_test_start = 0;% in order to concatinate data from all levels
 
-for i = 2:num_of_labels %not including base-line    
+start = 1;
+if num_of_labels == 2
+    start = 1;
+end
+for i = start:num_of_labels %not including base-line    
     num_windows = count(1,i);
     P = train_per ;
     num_train_windows = round(P*num_windows);%number of inputs in training for level i

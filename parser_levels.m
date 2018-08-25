@@ -1,4 +1,4 @@
-function [ data, labels, counter, StNoSt_labels ] = parser_levels( subject, seg_len, over_lap, filesLoaded, sub_num, flag_St )
+function [ data, labels, counter, StNoSt_data, StNoSt_labels, counter_st ] = parser_levels( subject, seg_len, over_lap, filesLoaded, sub_num, flag_St, num_levels )
 %Gets subject and the length of segment window and over lap percantage in
 %   fractions (0.5, 0.0 etc.), filesLoaded and the subject number. Also
 %   flagSt == 1 <=> we want array of Stress/NoStress labels.
@@ -11,14 +11,20 @@ function [ data, labels, counter, StNoSt_labels ] = parser_levels( subject, seg_
 %            4) StNoSt_labels optional. return array of Stress/NoStress
 %            labels: (1,0) == NoStress and (0,1) == Stress
         
-        num_levels = 6; %**Need to check global
+         
         BLOCKS = 26;
         
         
         data = cell(num_levels,1);
         labels = cell(num_levels,1);
-        StNoSt_labels = cell(num_levels,1);
+        
+        %Stress/NoStress
+        StNoSt_data = cell(2,1);
+        StNoSt_labels = cell(2,1);
+        
+        %Counters
         counter = zeros(1,num_levels);
+        counter_st = zeros(1,2);
         
         for cond = 1:2 %Stress and NoStress
             for curr_b = 1:BLOCKS %Number of the blocks
@@ -45,15 +51,29 @@ function [ data, labels, counter, StNoSt_labels ] = parser_levels( subject, seg_
                         end
                         %Points after the last index in the level
                         last = counter(1,level+1) + 1; 
+                        
+                        if flag_St == 1
+                            last_st = counter_st(1,cond) + 1; 
+                        end
+                        
                         %Append to data and labels
                         data{level+1,last}(:,:) = new_seg;
                         labels{level+1,last}(:,:) = new_label;
-                        %Append to tress/NoStress labels
+                        
+                        %Append to tress/NoStress labels and data
                         if flag_St == 1
-                            StNoSt_labels{level+1,last}(:,:) = new_st_label;
+                            StNoSt_data{cond,last_st}(:,:) = new_seg;
+                            StNoSt_labels{cond,last_st}(:,:) = new_st_label;
                         end
+                        
                         %Update the counter
                         counter(1,level+1) = last;
+                        
+                        %Update the counter_st if needed
+                        if flag_St == 1
+                            counter_st(1,cond) = last_st;
+                        end
+                        
                         %Jump to next segment's starting index
                         ind = ind + seg_len - back;
                     end

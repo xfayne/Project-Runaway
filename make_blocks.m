@@ -1,6 +1,7 @@
-function [ Blocks ] = make_blocks( EEG_NS, EEG_ST )
+function [ Blocks ] = make_blocks( EEG_NS, EEG_ST ,num_levels )
 %EEG_NS : if file is loaded otherwise: EEG_NS == 0
 %EEG_ST : if file is loaded otherwise: EEG_ST == 0
+%num_levels number of levels: 6 (original), 3
 %Returns: 2x2 cell array: Blocks{1:2,1} = 2 matrix with size 26x3  which contains :
 %all bat blocks:
 %column 1: start time; 
@@ -38,7 +39,7 @@ for j = 1:2 %Extruct from stress and no stress conditions
         if strcmp(t.type,'runStart') %Start of Block  
             Blocks{j,2}(index,1) =  parser_runStart(t.code);  %Array of all blocks objects
             Blocks{j}(index,1) = t.latency; %Start time of the block
-            Blocks{j}(index, 3) = level(Blocks{j,2}(index,1).nLevel, Blocks{j,2}(index,1).ringSize); %Calculate the block's level 
+            Blocks{j}(index, 3) = level(Blocks{j,2}(index,1).nLevel, Blocks{j,2}(index,1).ringSize, num_levels); %Calculate the block's level 
             foundStart = true; %Now we need to find runEnd of that block
         elseif strcmp(t.type, 'runEnd') && (foundStart) %Found start of a block and this is the block's end time
             Blocks{j}(index, 2) = t.latency;  %Block's end time

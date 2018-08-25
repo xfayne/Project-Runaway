@@ -5,7 +5,7 @@ function [ voltages ] = parser_voltage(data, startTime, endTime )
   index = ind - startTime +1;
   
     while (ind < endTime)
-        voltages(index) = data(ind);
+        voltages(1,index) = data(1,ind);
         ind = ind+1;
         index = index+1;
     end
